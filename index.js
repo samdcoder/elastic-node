@@ -61,7 +61,6 @@ app.get('/search', function (req, res){
       }
     }
   }
-  console.log('req.query[q]', req.query['q']);
   // perform the actual search passing in the index, the search query and the type
   client.search({index:'scotch.io-tutorial',  body:body, type:'countries_list'})
   .then(results => {

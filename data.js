@@ -11,7 +11,6 @@ var bulk = [];
 //loop through each city and create and push two objects into the array in each loop
 //first object sends the index and type you will be saving the data as
 //second object is the data you want to index
-console.log('countries => ', countries);
 countries.forEach(country =>{
    bulk.push({index:{ 
                  _index:"scotch.io-tutorial", 

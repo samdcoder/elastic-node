@@ -62,7 +62,7 @@ app.get('/search', function (req, res){
     }
   }
   // perform the actual search passing in the index, the search query and the type
-  client.search({index:'scotch.io-tutorial',  body:body, type:'countries_list'})
+  client.search({index:'countries-data',  body:body, type:'countries_list'})
   .then(results => {
     res.send(results.hits.hits);
   })

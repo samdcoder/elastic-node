@@ -1,0 +1,11 @@
+commands 
+
+Delete an index 
+
+curl -X DELETE "localhost:9200/countries-data?pretty"
+
+
+All records
+GET http://localhost:9200/_search?q=_  
+
+http://127.0.0.1:9200/countries-data/_search/?size=1000

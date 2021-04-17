@@ -34,19 +34,7 @@ async function run () {
     }
   }, { ignore: [400] });
   console.log('length => ', countries.length);
-
-  //create data 
-  // for(var i = 0; i < countries.length; i++){
-  //   const {country, name:city, lat, lng} = countries[i];
-  //   const inputObject = {
-  //     country,
-  //     city, 
-  //     lat, 
-  //     lng
-  //   }
-  //   console.log('inputObject => ',  inputObject);
-  //   bulk.push(inputObject)
-  // }
+  
   countries.forEach(c =>{
 
     const {country, name:city, lat, lng} = c;
@@ -96,12 +84,3 @@ async function run () {
 run().catch(console.log)
 
 
-
-//perform bulk indexing of the data passed
-// client.bulk({body:bulk}, function( err, response  ){ 
-//          if( err ){ 
-//              console.log("Failed Bulk operation".red, err) 
-//          } else { 
-//              console.log("Successfully imported %s".green, countries.length); 
-//          } 
-// }); 

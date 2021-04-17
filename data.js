@@ -1,5 +1,7 @@
 'use strict'
 
+//this is a one time script used to populate elastic search DB with countries data which is stored is countries.json
+
 require('array.prototype.flatmap').shim()
 const { Client } = require('elasticsearch')
 const client = new Client({
@@ -7,7 +9,8 @@ const client = new Client({
 })
 
 // ping the client to be sure Elasticsearch is up
-const countries = require('./countries.json');
+const countries = require('./cities.json');
+const {indexName} = require('./config.json');
 // declare an empty array called bulk
 var bulk = [];
 //loop through each city and create and push two objects into the array in each loop
@@ -17,27 +20,52 @@ var bulk = [];
 
 async function run () {
   await client.indices.create({
-    index: 'countries-data',
+    index: indexName,
     body: {
       mappings: {
         properties: {
-          name: { type: 'text' },
-          code: { type: 'text' },
+          country: { type: 'text' },
+          city: { type: 'text' },
+          lat: { type: 'text' },
+          lng: { type: 'text' },
+
         }
       }
     }
   }, { ignore: [400] });
+  console.log('length => ', countries.length);
 
   //create data 
-  countries.forEach(country =>{
-    bulk.push(country)
+  // for(var i = 0; i < countries.length; i++){
+  //   const {country, name:city, lat, lng} = countries[i];
+  //   const inputObject = {
+  //     country,
+  //     city, 
+  //     lat, 
+  //     lng
+  //   }
+  //   console.log('inputObject => ',  inputObject);
+  //   bulk.push(inputObject)
+  // }
+  countries.forEach(c =>{
+
+    const {country, name:city, lat, lng} = c;
+    const inputObject = {
+      country,
+      city, 
+      lat, 
+      lng
+    }
+    bulk.push(inputObject)
   });
-  const body = bulk.flatMap(doc => [{ index: { _index: 'countries-data' } }, doc])
+  console.log("bulk length => ", bulk.length)
+
+  const body = bulk.flatMap(doc => [{ index: { _index: indexName } }, doc])
 
   const { body: bulkResponse } = await client.bulk({ refresh: true, body })
 
 
-  if (bulkResponse.errors) {
+  if (bulkResponse && bulkResponse.errors) {
     const erroredDocuments = []
     // The items array has the same order of the dataset we just indexed.
     // The presence of the `error` key indicates that the operation
@@ -59,7 +87,7 @@ async function run () {
     console.log(erroredDocuments)
   }
 
-  const { body: count } = await client.count({ index: 'countries-data' })
+  const { body: count } = await client.count({ index: indexName })
   console.log(count)
 
 

@@ -1,10 +1,12 @@
 //index.js
 //require the Elasticsearch librray
-const elasticsearch = require('elasticsearch');
+
+const { Client } = require('@elastic/elasticsearch')
+const client = new Client({ node: 'http://localhost:9200' })
 // instantiate an elasticsearch client
-const client = new elasticsearch.Client({
-   hosts: [ 'http://localhost:9200']
-});
+// const client = new Client({
+//    hosts: [ 'http://localhost:9200']
+// });
 //require Express
 const express = require( 'express' );
 // instanciate an instance of express and hold the value in a constant called app
@@ -13,6 +15,8 @@ const app     = express();
 const bodyParser = require('body-parser')
 //require the path library
 const path    = require( 'path' );
+
+const {indexName} = require('./config.json');
 
 // ping the client to be sure Elasticsearch is up
 client.ping({
@@ -49,27 +53,57 @@ app.get('/', function(req, res){
 })
 
 // define the /search route that should return elastic search results 
-app.get('/search', function (req, res){
+app.get('/search', async function (req, res){
   // declare the query object to search elastic search and return only 200 results from the first result found. 
   // also match any data where the name is like the query string sent in
-  let body = {
-    size: 200,
-    from: 0, 
-    query: {
-      match: {
-          name: req.query['q']
+  // let body = {
+  //   size: 1000000,
+  //   from: 0, 
+  //   query: {
+  //     match: {
+  //         name: req.query['q']
+  //     }
+  //   }
+  // }
+  // req.query['q']
+  // console.log('body => ', body);
+  // perform the actual search passing in the index, the search query and the type
+  const given = req.query.q;
+  console.log('given => ', given)
+  console.log('indexName => ', indexName)
+  const { body } = await client.search({
+    index: indexName,
+    body: {
+      query: {
+        match: {
+          city: given
+        }
       }
     }
-  }
-  // perform the actual search passing in the index, the search query and the type
-  client.search({index:'countries-data',  body:body, type:'countries_list'})
-  .then(results => {
-    res.send(results.hits.hits);
   })
-  .catch(err=>{
-    console.log(err)
-    res.send([]);
-  });
+//   const response = await client.search({
+//   index: indexName,
+//   body: {
+//     query: {
+//       match: {
+//         body: given
+//       }
+//     }
+//   }
+// })
+ 
+  console.log('result => ', body)
+  res.send(body.hits.hits);
+
+  // client.search({index:'countries-data', from:20, size:100, body:{"city": req.query['q']}})
+  // .then(results => {
+  //   console.log('results => ', results)
+  //   res.send(results.hits.hits);
+  // })
+  // .catch(err=>{
+  //   console.log(err)
+  //   res.send([]);
+  // });
 
 })
 // listen on the specified port

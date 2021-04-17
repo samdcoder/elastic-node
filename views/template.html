@@ -24,7 +24,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <!-- display the city name and country  -->
-                    {{ result._source.name }}, {{ result._source.code }} 
+                    {{ result._source.city }} {{ result._source.country }} 
                 </div>
                 <div class="panel-body">
                 <!-- display the latitude and longitude of the city  -->
@@ -109,7 +109,6 @@
             axios.get("http://127.0.0.1:3001/search?q=" + this.query)
                 .then(response => {
                     this.results = response.data;
-
                 })
         }
     },
